@@ -1,11 +1,13 @@
 {
-  "name": "proxy",
+  "name": "advanced-proxy",
   "version": "1.0.0",
+  "description": "Express-based HTML/CSS/JS proxy with audio streaming and fancy UI",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
     "express": "^4.18.2",
     "node-fetch": "^2.6.12"
   }
