@@ -1,25 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Proxy-o-Rama</title>
-  <link rel="stylesheet" href="/style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Proxy-o-Rama Pro</title>
+  <style>
+    :root {
+      --bg-dark: #1e1e2f;
+      --fg-dark: #dcdfe4;
+      --bg-light: #fafafa;
+      --fg-light: #222;
+      --accent: #ff6a00;
+    }
+    body {
+      margin: 0;
+      color: var(--fg-dark);
+      background: var(--bg-dark);
+      font-family: "Segoe UI", sans-serif;
+    }
+    body.light {
+      background: var(--bg-light);
+      color: var(--fg-light);
+    }
+    .shell-header {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: var(--bg-dark); color: var(--fg-dark);
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 0.5rem 1rem;
+      z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    }
+    body.light .shell-header {
+      background: var(--bg-light); color: var(--fg-light);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .shell-search {
+      display: flex;
+    }
+    .shell-input {
+      padding: 0.5rem; border: 2px solid var(--accent);
+      border-radius: 4px 0 0 4px; outline: none;
+      width: 20rem;
+    }
+    .shell-go {
+      padding: 0.5rem 1rem;
+      background: var(--accent); border: none; color: #fff;
+      border-radius: 0 4px 4px 0; cursor: pointer;
+    }
+    .theme-btn {
+      background: transparent; border: none;
+      font-size: 1.2rem; cursor: pointer; margin-right: 1rem;
+    }
+    .shell-badge {
+      font-size: 0.9rem; opacity: 0.8;
+    }
+    .shell-main {
+      padding: 5rem 1rem 1rem;
+    }
+    /* Ensure iframe, video, audio fit */
+    .shell-main img,
+    .shell-main iframe,
+    .shell-main video,
+    .shell-main audio {
+      max-width: 100% !important;
+    }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Proxy-o-Rama</h1>
-    <form action="/proxy" method="get" class="proxy-form">
-      <input
-        type="text"
-        name="url"
-        class="url-input"
-        placeholder="Enter URL (https://…)"
-        required
-      />
-      <button type="submit" class="go-button">Go!</button>
-    </form>
-    <p>Surf anonymously or stream embedded audio.</p>
-  </div>
+  <header class="shell-header">
+    <div class="nav-left">
+      <button onclick="toggleTheme()" class="theme-btn">🌗</button>
+      <form action="/proxy" method="get" class="shell-search">
+        <input name="url" type="text" placeholder="🔍 Enter URL" class="shell-input" required/>
+        <button type="submit" class="shell-go">Go</button>
+      </form>
+    </div>
+    <div class="nav-right">
+      <span class="shell-badge">home</span>
+    </div>
+  </header>
+  <main class="shell-main">
+    <h2>Welcome to Proxy-o-Rama Pro</h2>
+    <p>Paste any URL above to browse through our advanced proxy. Supports audio, video, and chunked JS rewrites.</p>
+  </main>
+  <script>
+    window.toggleTheme = () => {
+      document.body.classList.toggle("light");
+      localStorage.theme = document.body.classList.contains("light")?"light":"dark";
+    };
+    window.onload = () => {
+      if (localStorage.theme === "light") document.body.classList.add("light");
+    };
+  </script>
 </body>
 </html>
