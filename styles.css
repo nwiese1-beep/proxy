@@ -1,0 +1,29 @@
+:root{
+  --bg:#1f2226;
+  --card:#232629;
+  --accent:#2b8cff;
+  --muted:#bfc4c9;
+  --glass: rgba(255,255,255,0.03);
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--muted);background:linear-gradient(180deg,var(--bg) 0%, #141517 100%);}
+#app{display:flex;flex-direction:column;height:100%}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px;background:var(--card);border-bottom:1px solid rgba(255,255,255,0.02)}
+.brand{color:white;font-weight:700;font-size:18px}
+.controls{display:flex;gap:10px;align-items:center}
+.controls input{padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:var(--glass);color:var(--muted);min-width:360px;outline:none}
+.controls button{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:white;font-weight:600;cursor:pointer}
+.controls .icon{background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted);padding:8px 10px;border-radius:8px}
+.quickbar{display:flex;gap:8px;padding:12px;background:transparent;flex-wrap:wrap}
+.quickbar button{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 12px;border-radius:10px;cursor:pointer}
+#main{flex:1;display:flex;align-items:stretch;justify-content:stretch;padding:12px}
+#proxyFrame{flex:1;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:white;min-height:200px}
+#footer{display:flex;justify-content:space-between;padding:10px 18px;background:transparent;border-top:1px solid rgba(255,255,255,0.02);font-size:13px;color:var(--muted)}
+a{color:var(--accent);text-decoration:none}
+.login-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%}
+#loginForm{background:var(--card);padding:28px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.6);display:flex;flex-direction:column;gap:12px;min-width:320px}
+#loginForm h1{color:white;margin:0}
+#loginForm input{padding:12px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--muted)}
+#loginForm button{background:var(--accent);color:white;border-radius:10px;padding:10px;border:none;cursor:pointer}
+@media(max-width:720px){.controls input{min-width:120px;width:48vw}}
+.smalllinks a{margin-left:12px}
