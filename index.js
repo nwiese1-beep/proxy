@@ -26,17 +26,17 @@ app.get("/proxy", async (req, res) => {
     let html = await response.text();
 
     // Rewrite href and src to route through proxy
-    html = html.replace(/(href|src)="([^"]*)"/g, (match, attr, link) => {
-      if (link.startsWith("http") || link.startsWith("https")) {
-        return `${attr}="/proxy?url=${encodeURIComponent(link)}"`;
-      } else if (link.startsWith("//")) {
-        return `${attr}="/proxy?url=${encodeURIComponent("http:" + link)}"`;
-      } else if (link.startsWith("/")) {
-        const baseUrl = new URL(url);
-        return `${attr}="/proxy?url=${encodeURIComponent(baseUrl.origin + link)}"`;
-      }
-      return match;
-    });
+   html = html.replace(/(href|src|srcset|data-src)=["']([^"']+)["']/g, (match, attr, link) => {
+  if (link.startsWith("http") || link.startsWith("https")) {
+    return `${attr}="/proxy?url=${encodeURIComponent(link)}"`;
+  } else if (link.startsWith("//")) {
+    return `${attr}="/proxy?url=${encodeURIComponent("http:" + link)}"`;
+  } else if (link.startsWith("/")) {
+    const baseUrl = new URL(url);
+    return `${attr}="/proxy?url=${encodeURIComponent(baseUrl.origin + link)}"`;
+  }
+  return match;
+});
 
     res.send(html);
   } catch (e) {
