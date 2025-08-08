@@ -1,30 +1,99 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html>
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Proxy-o-Rama Pro</title>
-  <link rel="stylesheet" href="style.css"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modern Proxy</title>
+<style>
+  :root { --accent:#2b8cff; --bg:#f6f7fb; --card:#fff; }
+  body { margin:0; background:var(--bg); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color:#111; }
+  header { padding:20px; display:flex; justify-content:center; align-items:center; gap:12px; }
+  #url { width:60%; max-width:880px; padding:12px 14px; border-radius:10px; border:1px solid #e6e6ea; background:#fff; font-size:16px; box-sizing:border-box; }
+  #go { padding:12px 18px; border-radius:10px; border:none; background:var(--accent); color:white; font-weight:600; cursor:pointer; }
+  #controls { display:flex; justify-content:center; gap:8px; margin-bottom:6px; }
+  #frame { width:100%; height:calc(100vh - 120px); border:none; display:block; background:white; }
+  .bar { display:flex; justify-content:center; align-items:center; gap:8px; padding:8px; }
+  .small { font-size:13px; color:#666; }
+  #quick { margin-left:10px; }
+  button.quick { background:#fff; border:1px solid #eee; padding:8px 10px; border-radius:8px; cursor:pointer; }
+  footer { padding:12px; text-align:center; color:#888; font-size:13px; }
+  @media (max-width:720px){
+    #url { width:70%; }
+    #go{ padding:10px; }
+  }
+</style>
 </head>
 <body>
-  <header class="header">
-    <form id="urlForm" class="url-form">
-      <input id="urlInput" name="url" type="text" placeholder="Paste URL here" required/>
-      <button id="goButton" type="submit">Go</button>
-    </form>
+  <header>
+    <div id="controls">
+      <input id="url" placeholder="Enter URL (ex: youtube.com) and press Go" />
+      <button id="go">Go ★</button>
+      <div id="quick">
+        <button class="quick" data-href="https://youtube.com">YouTube</button>
+        <button class="quick" data-href="https://twitter.com">Twitter</button>
+        <button class="quick" data-href="https://github.com">GitHub</button>
+      </div>
+    </div>
   </header>
-
-  <main id="contentContainer" class="content-container">
-    <h2>Welcome to Proxy-o-Rama Pro</h2>
-    <p>Enter a URL above to begin browsing through our advanced proxy.</p>
-  </main>
-
-  <!-- Loading & Error Overlays as before… -->
-
-  <footer class="footer">
-    <p>&copy; 2025 Proxy-o-Rama Pro</p>
+  <iframe id="frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+  <footer>
+    <span class="small">Minimal proxy — use responsibly. Terms • Privacy • Contact</span>
   </footer>
 
-  <script src="app.js"></script>
+<script>
+  // If user presses Enter while in input or clicks Go, load proxied URL into iframe.
+  const PROXY_PATH = '/proxy?url=';
+  const urlInput = document.getElementById('url');
+  const goBtn = document.getElementById('go');
+  const frame = document.getElementById('frame');
+
+  function norm(u){
+    if(!u) return null;
+    u = u.trim();
+    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(u)) {
+      u = 'https://' + u;
+    }
+    try { return new URL(u).toString(); } catch { return null; }
+  }
+  function openProxied(raw){
+    const t = norm(raw);
+    if(!t) return alert('Please enter a valid URL.');
+    const prox = PROXY_PATH + encodeURIComponent(t);
+    // Set iframe src to our proxy endpoint so the browser address bar doesn't show the real site
+    frame.src = prox;
+    // save local history
+    try {
+      const h = JSON.parse(localStorage.getItem('pp_history') || '[]');
+      h.unshift({ url: t, at: Date.now() });
+      localStorage.setItem('pp_history', JSON.stringify(h.slice(0, 50)));
+    } catch(e){}
+  }
+
+  goBtn.addEventListener('click', ()=> openProxied(urlInput.value));
+  urlInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') { e.preventDefault(); openProxied(urlInput.value); } });
+
+  document.querySelectorAll('.quick').forEach(b=>{
+    b.addEventListener('click', ()=> openProxied(b.dataset.href));
+  });
+
+  // Simple history list on focus (local only)
+  urlInput.addEventListener('focus', () => {
+    const h = JSON.parse(localStorage.getItem('pp_history') || '[]');
+    // if there is history, show last 5 as placeholder suggestion (simple)
+    if(h && h.length){
+      urlInput.placeholder = 'Recent: ' + h.slice(0,5).map(x=>x.url.replace(/^https?:\/\//,'')).join(' • ');
+    }
+  });
+
+  // On load, detect if frame should be preloaded from location.hash
+  window.addEventListener('load', () => {
+    const h = location.hash.slice(1);
+    if (h) {
+      urlInput.value = decodeURIComponent(h);
+      openProxied(h);
+    }
+  });
+
+</script>
 </body>
 </html>
