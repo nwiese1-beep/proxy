@@ -1,0 +1,64 @@
+/* Base reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #1e2024, #3a3f52);
+  color: #fff;
+}
+
+.container {
+  text-align: center;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.proxy-form {
+  display: flex;
+  margin-bottom: 0.75rem;
+}
+
+.url-input {
+  width: 350px;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 4px 0 0 4px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.go-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background-color: #ff6a00;
+  color: #fff;
+  font-size: 1rem;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.go-button:hover {
+  background-color: #e55800;
+}
+
+p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  margin-top: 0.5rem;
+}
