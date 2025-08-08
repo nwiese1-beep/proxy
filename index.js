@@ -1,27 +1,24 @@
-const express = require("express");
-const fetch = require("node-fetch");
-const cheerio = require("cheerio");
-const path = require("path");
+const express   = require("express");
+const fetch     = require("node-fetch");
+const cheerio   = require("cheerio");
+const path      = require("path");
 
 const app = express();
-app.use(express.urlencoded({ extended: true }));
 
-// Serve static assets (CSS, JS)
-app.use("/public", express.static(path.join(__dirname, "public")));
+// Serve all static files (style.css, index.html won’t be exposed directly here because we send it explicitly)
+app.use(express.static(__dirname));
 
-// Home page
+// Home: send your HTML form
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "views", "index.html"));
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Proxy route
+// Proxy endpoint
 app.get("/proxy", async (req, res) => {
   let url = req.query.url;
-  if (!url) {
-    return res.status(400).send("No URL provided");
-  }
+  if (!url) return res.status(400).send("No URL provided");
 
-  // Normalize URL
+  // Ensure http://
   if (!/^https?:\/\//i.test(url)) {
     url = "http://" + url;
   }
@@ -30,40 +27,28 @@ app.get("/proxy", async (req, res) => {
     const upstream = await fetch(url);
     const contentType = upstream.headers.get("content-type") || "";
 
-    // If not HTML, pipe it directly (e.g. images, audio, fonts)
+    // Non-HTML -> stream straight through (audio, images, CSS, etc.)
     if (!contentType.includes("text/html")) {
       res.set("Content-Type", contentType);
       return upstream.body.pipe(res);
     }
 
-    // Otherwise rewrite the HTML
-    const text = await upstream.text();
-    const $ = cheerio.load(text, { decodeEntities: false });
+    // HTML -> rewrite links
+    const body = await upstream.text();
+    const $ = cheerio.load(body, { decodeEntities: false });
 
-    // Rewrite all links, scripts, images, audio, forms
-    $("*[href], *[src], form[action]").each((i, el) => {
-      ["href", "src", "action"].forEach((attr) => {
-        let link = $(el).attr(attr);
-        if (!link) return;
+    // Rewrite href/src/action so assets/forms go through /proxy
+    $("*[href], *[src], form[action]").each((_, el) => {
+      ["href", "src", "action"].forEach(attr => {
+        const link = $(el).attr(attr);
+        if (!link || link.startsWith("#") || link.startsWith("javascript:")) return;
 
-        // Skip anchors & JS pseudo-links
-        if (link.startsWith("#") || link.startsWith("javascript:")) return;
-
-        // Resolve protocol‐relative, absolute, and relative URLs
         let absolute;
-        if (link.startsWith("//")) {
-          absolute = "http:" + link;
-        } else if (link.startsWith("/")) {
-          const base = new URL(url);
-          absolute = base.origin + link;
-        } else if (/^https?:\/\//i.test(link)) {
-          absolute = link;
-        } else {
-          const base = new URL(url);
-          absolute = new URL(link, base).href;
-        }
+        if (link.startsWith("//"))       absolute = "http:" + link;
+        else if (link.startsWith("/"))    absolute = new URL(url).origin + link;
+        else if (/^https?:\/\//i.test(link)) absolute = link;
+        else                              absolute = new URL(link, url).href;
 
-        // Point back through our proxy
         $(el).attr(attr, "/proxy?url=" + encodeURIComponent(absolute));
       });
     });
@@ -71,12 +56,10 @@ app.get("/proxy", async (req, res) => {
     res.send($.html());
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error fetching the requested URL");
+    res.status(500).send("Error fetching URL");
   }
 });
 
-// Start server
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Proxy server running at http://localhost:${port}`);
-});
+// Start
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Running at http://localhost:${PORT}`));
