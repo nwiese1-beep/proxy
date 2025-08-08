@@ -1,194 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Proxy-o-Rama Pro</title>
-<link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Proxy-o-Rama Pro</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-<div id="themeToggle" class="theme-toggle">🌗</div>
-<header class="header">
-  <div class="header-left">
-    <span class="logo">Proxy-o-Rama Pro</span>
-  </div>
-  <div class="header-right">
-    <nav class="quick-links">
-      <a href="#" data-url="https://discord.com">Discord</a>
-      <a href="#" data-url="https://open.spotify.com">Spotify</a>
-      <a href="#" data-url="https://github.com">GitHub</a>
-      <a href="#" data-url="https://twitter.com">Twitter</a>
-      <a href="#" data-url="https://youtube.com">YouTube</a>
-      <a href="#" data-url="https://facebook.com">Facebook</a>
-      <a href="#" data-url="https://instagram.com">Instagram</a>
-      <a href="#" data-url="https://reddit.com">Reddit</a>
-      <a href="#" data-url="https://linkedin.com">LinkedIn</a>
-      <a href="#" data-url="https://pinterest.com">Pinterest</a>
-      <a href="#" data-url="https://news.ycombinator.com">Hacker News</a>
-      <a href="#" data-url="https://stackoverflow.com">StackOverflow</a>
-      <a href="#" data-url="https://medium.com">Medium</a>
-      <a href="#" data-url="https://vimeo.com">Vimeo</a>
-      <a href="#" data-url="https://twitch.tv">Twitch</a>
-      <a href="#" data-url="https://gitlab.com">GitLab</a>
-      <a href="#" data-url="https://bitbucket.org">Bitbucket</a>
-      <a href="#" data-url="https://dribbble.com">Dribbble</a>
-      <a href="#" data-url="https://behance.net">Behance</a>
-      <a href="#" data-url="https://stackexchange.com">StackExchange</a>
-    </nav>
-  </div>
-</header>
-<div class="main-container">
-  <form id="urlForm" class="search-form">
-    <input id="urlInput" name="url" type="text" placeholder="Paste URL here" required/>
-    <button id="goButton" type="submit">Go</button>
-  </form>
-  <aside class="sidebar">
-    <ul class="link-list">
-      <li><a href="#" data-url="https://twitter.com">Twitter</a></li>
-      <li><a href="#" data-url="https://youtube.com">YouTube</a></li>
-      <li><a href="#" data-url="https://reddit.com">Reddit</a></li>
-      <li><a href="#" data-url="https://medium.com">Medium</a></li>
-      <li><a href="#" data-url="https://github.com">GitHub</a></li>
-      <li><a href="#" data-url="https://stackoverflow.com">StackOverflow</a></li>
-      <li><a href="#" data-url="https://news.ycombinator.com">Hacker News</a></li>
-      <li><a href="#" data-url="https://open.spotify.com">Spotify</a></li>
-      <li><a href="#" data-url="https://discord.com">Discord</a></li>
-      <li><a href="#" data-url="https://instagram.com">Instagram</a></li>
-    </ul>
-  </aside>
-  <section id="contentContainer" class="content-container">
+  <header class="header">
+    <form id="urlForm" class="url-form">
+      <input id="urlInput" name="url" type="text" placeholder="Paste URL here" required/>
+      <button id="goButton" type="submit">Go</button>
+    </form>
+  </header>
+
+  <main id="contentContainer" class="content-container">
     <h2>Welcome to Proxy-o-Rama Pro</h2>
-    <p>Enter a URL above or choose from the quick links to begin browsing through our advanced proxy.</p>
-  </section>
-</div>
-<div id="loadingOverlay" class="overlay loading-overlay hidden">
-  <div class="spinner"></div>
-</div>
-<div id="errorOverlay" class="overlay error-overlay hidden">
-  <div class="error-box">
-    <p id="errorMsg"></p>
-    <button id="errorClose">Close</button>
-  </div>
-</div>
-<footer class="footer">
-  <p>&copy; 2025 Proxy-o-Rama Pro</p>
-</footer>
-<script>
-(function(){
-  var themeToggle = document.getElementById('themeToggle');
-  var urlForm = document.getElementById('urlForm');
-  var urlInput = document.getElementById('urlInput');
-  var loadingOverlay = document.getElementById('loadingOverlay');
-  var errorOverlay = document.getElementById('errorOverlay');
-  var errorMsg = document.getElementById('errorMsg');
-  var errorClose = document.getElementById('errorClose');
-  var contentContainer = document.getElementById('contentContainer');
-  var quickLinks = document.querySelectorAll('.quick-links a');
-  var sidebarLinks = document.querySelectorAll('.link-list a');
+    <p>Enter a URL above to begin browsing through our advanced proxy.</p>
+  </main>
 
-  function toggleTheme(){
-    document.body.classList.toggle('light');
-    if(document.body.classList.contains('light')){
-      localStorage.setItem('theme','light');
-    } else {
-      localStorage.removeItem('theme');
-    }
-  }
+  <!-- Loading & Error Overlays as before… -->
 
-  function showLoading(){
-    loadingOverlay.classList.remove('hidden');
-  }
+  <footer class="footer">
+    <p>&copy; 2025 Proxy-o-Rama Pro</p>
+  </footer>
 
-  function hideLoading(){
-    loadingOverlay.classList.add('hidden');
-  }
-
-  function showError(message){
-    errorMsg.textContent = message;
-    errorOverlay.classList.remove('hidden');
-  }
-
-  function hideError(){
-    errorOverlay.classList.add('hidden');
-  }
-
-  function updateContent(html){
-    contentContainer.innerHTML = html;
-  }
-
-  function fetchUrl(u){
-    showLoading();
-    hideError();
-    fetch('/proxy?url='+encodeURIComponent(u))
-      .then(function(res){
-        var ct = res.headers.get('content-type')||'';
-        if(ct.indexOf('text/html')!==-1){
-          return res.text().then(handleHTML);
-        }
-        if(ct.indexOf('application/javascript')!==-1){
-          return res.text().then(handleJS);
-        }
-        return res.blob().then(handleBlob);
-      })
-      .catch(function(err){
-        showError(err.message);
-      })
-      .finally(function(){
-        hideLoading();
-      });
-  }
-
-  function handleHTML(html){
-    updateContent(html);
-  }
-
-  function handleJS(js){
-    var scriptEl = document.createElement('script');
-    scriptEl.type = 'module';
-    scriptEl.text = js;
-    document.body.appendChild(scriptEl);
-  }
-
-  function handleBlob(blob){
-    var url = URL.createObjectURL(blob);
-    var tag = document.createElement('a');
-    tag.href = url;
-    tag.download = '';
-    document.body.appendChild(tag);
-    tag.click();
-    document.body.removeChild(tag);
-  }
-
-  themeToggle.addEventListener('click',toggleTheme);
-
-  urlForm.addEventListener('submit',function(e){
-    e.preventDefault();
-    var u = urlInput.value.trim();
-    if(u) fetchUrl(u);
-  });
-
-  errorClose.addEventListener('click',hideError);
-
-  quickLinks.forEach(function(el){
-    el.addEventListener('click',function(e){
-      e.preventDefault();
-      fetchUrl(e.target.getAttribute('data-url'));
-    });
-  });
-
-  sidebarLinks.forEach(function(el){
-    el.addEventListener('click',function(e){
-      e.preventDefault();
-      fetchUrl(e.target.getAttribute('data-url'));
-    });
-  });
-
-  window.addEventListener('DOMContentLoaded',function(){
-    if(localStorage.getItem('theme')==='light'){
-      document.body.classList.add('light');
-    }
-  });
-})();
-</script>
+  <script src="app.js"></script>
 </body>
 </html>
