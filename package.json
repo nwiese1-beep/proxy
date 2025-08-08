@@ -1,7 +1,6 @@
 {
-  "name": "advanced-proxy",
+  "name": "flattened-proxy",
   "version": "1.0.0",
-  "description": "Express-based HTML/CSS/JS proxy with audio streaming and fancy UI",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
