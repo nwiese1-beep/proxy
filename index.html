@@ -4,96 +4,57 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Modern Proxy</title>
-<style>
-  :root { --accent:#2b8cff; --bg:#f6f7fb; --card:#fff; }
-  body { margin:0; background:var(--bg); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; color:#111; }
-  header { padding:20px; display:flex; justify-content:center; align-items:center; gap:12px; }
-  #url { width:60%; max-width:880px; padding:12px 14px; border-radius:10px; border:1px solid #e6e6ea; background:#fff; font-size:16px; box-sizing:border-box; }
-  #go { padding:12px 18px; border-radius:10px; border:none; background:var(--accent); color:white; font-weight:600; cursor:pointer; }
-  #controls { display:flex; justify-content:center; gap:8px; margin-bottom:6px; }
-  #frame { width:100%; height:calc(100vh - 120px); border:none; display:block; background:white; }
-  .bar { display:flex; justify-content:center; align-items:center; gap:8px; padding:8px; }
-  .small { font-size:13px; color:#666; }
-  #quick { margin-left:10px; }
-  button.quick { background:#fff; border:1px solid #eee; padding:8px 10px; border-radius:8px; cursor:pointer; }
-  footer { padding:12px; text-align:center; color:#888; font-size:13px; }
-  @media (max-width:720px){
-    #url { width:70%; }
-    #go{ padding:10px; }
-  }
-</style>
+<link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header>
-    <div id="controls">
-      <input id="url" placeholder="Enter URL (ex: youtube.com) and press Go" />
-      <button id="go">Go ★</button>
-      <div id="quick">
-        <button class="quick" data-href="https://youtube.com">YouTube</button>
-        <button class="quick" data-href="https://twitter.com">Twitter</button>
-        <button class="quick" data-href="https://github.com">GitHub</button>
-      </div>
+<div id="app">
+  <div class="topbar">
+    <div class="brand">Proxy ★</div>
+    <div class="controls">
+      <input id="urlInput" placeholder="Enter URL (ex: youtube.com)"/>
+      <button id="goBtn">Go ★</button>
+      <button id="historyBtn" class="icon">History</button>
+      <button id="bookBtn" class="icon">Bookmarks</button>
+      <button id="prefsBtn" class="icon">Prefs</button>
     </div>
-  </header>
-  <iframe id="frame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
-  <footer>
-    <span class="small">Minimal proxy — use responsibly. Terms • Privacy • Contact</span>
-  </footer>
+  </div>
 
-<script>
-  // If user presses Enter while in input or clicks Go, load proxied URL into iframe.
-  const PROXY_PATH = '/proxy?url=';
-  const urlInput = document.getElementById('url');
-  const goBtn = document.getElementById('go');
-  const frame = document.getElementById('frame');
+  <div class="quickbar" id="quickbar"></div>
 
-  function norm(u){
-    if(!u) return null;
-    u = u.trim();
-    if (!/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//.test(u)) {
-      u = 'https://' + u;
-    }
-    try { return new URL(u).toString(); } catch { return null; }
-  }
-  function openProxied(raw){
-    const t = norm(raw);
-    if(!t) return alert('Please enter a valid URL.');
-    const prox = PROXY_PATH + encodeURIComponent(t);
-    // Set iframe src to our proxy endpoint so the browser address bar doesn't show the real site
-    frame.src = prox;
-    // save local history
-    try {
-      const h = JSON.parse(localStorage.getItem('pp_history') || '[]');
-      h.unshift({ url: t, at: Date.now() });
-      localStorage.setItem('pp_history', JSON.stringify(h.slice(0, 50)));
-    } catch(e){}
-  }
+  <div id="main">
+    <iframe id="proxyFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"></iframe>
+  </div>
 
-  goBtn.addEventListener('click', ()=> openProxied(urlInput.value));
-  urlInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') { e.preventDefault(); openProxied(urlInput.value); } });
+  <div id="footer">
+    <div class="left">Minimal proxy • use responsibly</div>
+    <div class="right smalllinks">
+      <a href="#" id="aboutLink">About</a>
+      <a href="#" id="termsLink">Terms</a>
+      <a href="#" id="privacyLink">Privacy</a>
+    </div>
+  </div>
+</div>
 
-  document.querySelectorAll('.quick').forEach(b=>{
-    b.addEventListener('click', ()=> openProxied(b.dataset.href));
-  });
-
-  // Simple history list on focus (local only)
-  urlInput.addEventListener('focus', () => {
-    const h = JSON.parse(localStorage.getItem('pp_history') || '[]');
-    // if there is history, show last 5 as placeholder suggestion (simple)
-    if(h && h.length){
-      urlInput.placeholder = 'Recent: ' + h.slice(0,5).map(x=>x.url.replace(/^https?:\/\//,'')).join(' • ');
-    }
-  });
-
-  // On load, detect if frame should be preloaded from location.hash
-  window.addEventListener('load', () => {
-    const h = location.hash.slice(1);
-    if (h) {
-      urlInput.value = decodeURIComponent(h);
-      openProxied(h);
-    }
-  });
-
-</script>
+<script src="/auth.js"></script>
+<script src="/sw-register.js"></script>
+<script src="/serviceworker.js"></script>
+<script src="/ui.js"></script>
+<script src="/proxy-client.js"></script>
+<script src="/iframe-handler.js"></script>
+<script src="/history.js"></script>
+<script src="/bookmarks.js"></script>
+<script src="/quicklinks.js"></script>
+<script src="/prefs.js"></script>
+<script src="/theme.js"></script>
+<script src="/validator.js"></script>
+<script src="/fetcher.js"></script>
+<script src="/ws-handler.js"></script>
+<script src="/rewrite.js"></script>
+<script src="/css-rewriter.js"></script>
+<script src="/loader.js"></script>
+<script src="/modal.js"></script>
+<script src="/keyboard.js"></script>
+<script src="/analytics.js"></script>
+<script src="/errors.js"></script>
 </body>
 </html>
